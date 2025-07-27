@@ -1,0 +1,484 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Enums
+enum UserRole {
+  SYSTEM_ADMIN
+  GROUP_OWNER
+  INSTITUTE_ADMIN
+  STAFF
+  TEACHER
+  STUDENT
+  PARENT
+}
+
+enum InstituteType {
+  SCHOOL
+  KINDERGARTEN
+  COLLEGE
+  ENGINEERING_COLLEGE
+  MEDICAL_COLLEGE
+  UNIVERSITY
+  TRUST
+  COACHING_INSTITUTE
+  VOCATIONAL_INSTITUTE
+  RESEARCH_INSTITUTE
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+enum AdmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  WAITLISTED
+}
+
+enum BookStatus {
+  AVAILABLE
+  ISSUED
+  RESERVED
+  DAMAGED
+  LOST
+}
+
+enum FeeStatus {
+  PENDING
+  PAID
+  OVERDUE
+  PARTIAL
+}
+
+// Core Models
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      UserRole
+  firstName String
+  lastName  String
+  phone     String?
+  avatar    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  systemAdmin    SystemAdmin?
+  groupOwner     GroupOwner?
+  instituteAdmin InstituteAdmin?
+  staff          Staff?
+  teacher        Teacher?
+  student        Student?
+  parent         Parent?
+
+  @@map("users")
+}
+
+model SystemAdmin {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("system_admins")
+}
+
+model InstituteGroup {
+  id          String @id @default(cuid())
+  name        String
+  description String?
+  logo        String?
+  website     String?
+  phone       String?
+  email       String?
+  address     String?
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  owner      GroupOwner?
+  institutes Institute[]
+
+  @@map("institute_groups")
+}
+
+model GroupOwner {
+  id               String         @id @default(cuid())
+  userId           String         @unique
+  instituteGroupId String         @unique
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  instituteGroup   InstituteGroup @relation(fields: [instituteGroupId], references: [id], onDelete: Cascade)
+
+  @@map("group_owners")
+}
+
+model Institute {
+  id          String        @id @default(cuid())
+  name        String
+  type        InstituteType
+  code        String        @unique
+  description String?
+  logo        String?
+  website     String?
+  phone       String?
+  email       String?
+  address     String?
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  groupId         String?
+  group           InstituteGroup?    @relation(fields: [groupId], references: [id])
+  admins          InstituteAdmin[]
+  staff           Staff[]
+  teachers        Teacher[]
+  students        Student[]
+  departments     Department[]
+  courses         Course[]
+  academicYears   AcademicYear[]
+  admissions      Admission[]
+  attendanceRecords AttendanceRecord[]
+  library         Library?
+  feeStructures   FeeStructure[]
+
+  @@map("institutes")
+}
+
+model InstituteAdmin {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  instituteId String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institute   Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+
+  @@map("institute_admins")
+}
+
+model Department {
+  id          String @id @default(cuid())
+  name        String
+  code        String
+  description String?
+  instituteId String
+  institute   Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+
+  // Relations
+  courses  Course[]
+  staff    Staff[]
+  teachers Teacher[]
+
+  @@unique([code, instituteId])
+  @@map("departments")
+}
+
+model Staff {
+  id           String     @id @default(cuid())
+  userId       String     @unique
+  instituteId  String
+  departmentId String?
+  employeeId   String
+  position     String
+  salary       Float?
+  joinDate     DateTime
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institute    Institute  @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  department   Department? @relation(fields: [departmentId], references: [id])
+
+  @@unique([employeeId, instituteId])
+  @@map("staff")
+}
+
+model Teacher {
+  id           String     @id @default(cuid())
+  userId       String     @unique
+  instituteId  String
+  departmentId String?
+  employeeId   String
+  subject      String?
+  qualification String?
+  experience   Int?
+  salary       Float?
+  joinDate     DateTime
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institute    Institute  @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  department   Department? @relation(fields: [departmentId], references: [id])
+
+  // Relations
+  courses           CourseTeacher[]
+  attendanceRecords AttendanceRecord[]
+
+  @@unique([employeeId, instituteId])
+  @@map("teachers")
+}
+
+model Student {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  instituteId  String
+  rollNumber   String
+  admissionDate DateTime
+  dateOfBirth  DateTime?
+  bloodGroup   String?
+  address      String?
+  emergencyContact String?
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institute    Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+
+  // Relations
+  parents           StudentParent[]
+  enrollments       Enrollment[]
+  attendanceRecords AttendanceRecord[]
+  libraryTransactions LibraryTransaction[]
+  feeRecords        FeeRecord[]
+
+  @@unique([rollNumber, instituteId])
+  @@map("students")
+}
+
+model Parent {
+  id           String @id @default(cuid())
+  userId       String @unique
+  occupation   String?
+  relationship String
+  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relations
+  children StudentParent[]
+
+  @@map("parents")
+}
+
+model StudentParent {
+  id        String @id @default(cuid())
+  studentId String
+  parentId  String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  parent    Parent  @relation(fields: [parentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, parentId])
+  @@map("student_parents")
+}
+
+model AcademicYear {
+  id          String    @id @default(cuid())
+  name        String
+  startDate   DateTime
+  endDate     DateTime
+  isCurrent   Boolean   @default(false)
+  instituteId String
+  institute   Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+
+  // Relations
+  courses     Course[]
+  enrollments Enrollment[]
+  attendanceRecords AttendanceRecord[]
+
+  @@unique([name, instituteId])
+  @@map("academic_years")
+}
+
+model Course {
+  id             String       @id @default(cuid())
+  name           String
+  code           String
+  description    String?
+  credits        Int?
+  duration       String?
+  instituteId    String
+  departmentId   String?
+  academicYearId String
+  institute      Institute    @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  department     Department?  @relation(fields: [departmentId], references: [id])
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+
+  // Relations
+  teachers    CourseTeacher[]
+  enrollments Enrollment[]
+  subjects    Subject[]
+
+  @@unique([code, instituteId, academicYearId])
+  @@map("courses")
+}
+
+model CourseTeacher {
+  id        String  @id @default(cuid())
+  courseId  String
+  teacherId String
+  course    Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  teacher   Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, teacherId])
+  @@map("course_teachers")
+}
+
+model Subject {
+  id       String @id @default(cuid())
+  name     String
+  code     String
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([code, courseId])
+  @@map("subjects")
+}
+
+model Enrollment {
+  id             String       @id @default(cuid())
+  studentId      String
+  courseId       String
+  academicYearId String
+  enrollmentDate DateTime     @default(now())
+  status         String       @default("ACTIVE")
+  student        Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course         Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, courseId, academicYearId])
+  @@map("enrollments")
+}
+
+model Admission {
+  id             String          @id @default(cuid())
+  applicationId  String          @unique
+  firstName      String
+  lastName       String
+  email          String
+  phone          String
+  dateOfBirth    DateTime
+  address        String
+  documents      String? // JSON string
+  status         AdmissionStatus @default(PENDING)
+  appliedDate    DateTime        @default(now())
+  reviewedDate   DateTime?
+  reviewedBy     String?
+  comments       String?
+  instituteId    String
+  institute      Institute       @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+
+  @@map("admissions")
+}
+
+model AttendanceRecord {
+  id             String           @id @default(cuid())
+  studentId      String
+  teacherId      String?
+  instituteId    String
+  academicYearId String
+  date           DateTime
+  status         AttendanceStatus
+  remarks        String?
+  student        Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  teacher        Teacher?         @relation(fields: [teacherId], references: [id])
+  institute      Institute        @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  academicYear   AcademicYear     @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, date, academicYearId])
+  @@map("attendance_records")
+}
+
+// Library Management
+model Library {
+  id          String @id @default(cuid())
+  name        String
+  instituteId String @unique
+  institute   Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+
+  // Relations
+  books        Book[]
+  transactions LibraryTransaction[]
+
+  @@map("libraries")
+}
+
+model Book {
+  id          String     @id @default(cuid())
+  title       String
+  author      String
+  isbn        String?
+  publisher   String?
+  category    String?
+  totalCopies Int        @default(1)
+  availableCopies Int    @default(1)
+  status      BookStatus @default(AVAILABLE)
+  libraryId   String
+  library     Library    @relation(fields: [libraryId], references: [id], onDelete: Cascade)
+
+  // Relations
+  transactions LibraryTransaction[]
+
+  @@map("books")
+}
+
+model LibraryTransaction {
+  id         String    @id @default(cuid())
+  bookId     String
+  studentId  String
+  libraryId  String
+  issueDate  DateTime  @default(now())
+  dueDate    DateTime
+  returnDate DateTime?
+  fine       Float?    @default(0)
+  status     String    @default("ISSUED")
+  book       Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  student    Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  library    Library   @relation(fields: [libraryId], references: [id], onDelete: Cascade)
+
+  @@map("library_transactions")
+}
+
+// Fee Management
+model FeeStructure {
+  id          String @id @default(cuid())
+  name        String
+  amount      Float
+  description String?
+  dueDate     DateTime
+  instituteId String
+  institute   Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+
+  // Relations
+  feeRecords FeeRecord[]
+
+  @@map("fee_structures")
+}
+
+model FeeRecord {
+  id             String       @id @default(cuid())
+  studentId      String
+  feeStructureId String
+  amountPaid     Float        @default(0)
+  status         FeeStatus    @default(PENDING)
+  paidDate       DateTime?
+  dueDate        DateTime
+  student        Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  feeStructure   FeeStructure @relation(fields: [feeStructureId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, feeStructureId])
+  @@map("fee_records")
+}
+
+// Settings and Configuration
+model Settings {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+  type  String @default("STRING")
+
+  @@map("settings")
+}
