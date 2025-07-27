@@ -1,0 +1,67 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "login": "Login",
+    "logout": "Logout",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "settings": "Settings",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "invalidCredentials": "Invalid credentials"
+  },
+  "dashboard": {
+    "systemAdmin": "System Administrator Dashboard",
+    "groupOwner": "Group Owner Dashboard",
+    "instituteAdmin": "Institute Administrator Dashboard",
+    "staff": "Staff Dashboard",
+    "teacher": "Teacher Dashboard",
+    "student": "Student Dashboard",
+    "parent": "Parent Dashboard"
+  },
+  "institute": {
+    "name": "Institute Name",
+    "type": "Institute Type",
+    "code": "Institute Code",
+    "address": "Address",
+    "phone": "Phone",
+    "email": "Email",
+    "website": "Website"
+  },
+  "student": {
+    "rollNumber": "Roll Number",
+    "admissionDate": "Admission Date",
+    "dateOfBirth": "Date of Birth",
+    "bloodGroup": "Blood Group",
+    "emergencyContact": "Emergency Contact"
+  },
+  "attendance": {
+    "present": "Present",
+    "absent": "Absent",
+    "late": "Late",
+    "excused": "Excused",
+    "markAttendance": "Mark Attendance",
+    "attendanceReport": "Attendance Report"
+  },
+  "library": {
+    "books": "Books",
+    "issueBook": "Issue Book",
+    "returnBook": "Return Book",
+    "dueDate": "Due Date",
+    "fine": "Fine"
+  }
+}
