@@ -1,0 +1,67 @@
+{
+  "common": {
+    "welcome": "स्वागत",
+    "login": "लॉगिन",
+    "logout": "लॉगआउट",
+    "dashboard": "डैशबोर्ड",
+    "profile": "प्रोफाइल",
+    "settings": "सेटिंग्स",
+    "save": "सेव करें",
+    "cancel": "रद्द करें",
+    "edit": "संपादित करें",
+    "delete": "हटाएं",
+    "add": "जोड़ें",
+    "search": "खोजें",
+    "loading": "लोड हो रहा है...",
+    "error": "त्रुटि",
+    "success": "सफलता"
+  },
+  "auth": {
+    "signIn": "साइन इन",
+    "signOut": "साइन आउट",
+    "email": "ईमेल",
+    "password": "पासवर्ड",
+    "forgotPassword": "पासवर्ड भूल गए?",
+    "invalidCredentials": "अमान्य क्रेडेंशियल"
+  },
+  "dashboard": {
+    "systemAdmin": "सिस्टम एडमिनिस्ट्रेटर डैशबोर्ड",
+    "groupOwner": "ग्रुप ओनर डैशबोर्ड",
+    "instituteAdmin": "संस्थान एडमिनिस्ट्रेटर डैशबोर्ड",
+    "staff": "स्टाफ डैशबोर्ड",
+    "teacher": "शिक्षक डैशबोर्ड",
+    "student": "छात्र डैशबोर्ड",
+    "parent": "अभिभावक डैशबोर्ड"
+  },
+  "institute": {
+    "name": "संस्थान का नाम",
+    "type": "संस्थान का प्रकार",
+    "code": "संस्थान कोड",
+    "address": "पता",
+    "phone": "फोन",
+    "email": "ईमेल",
+    "website": "वेबसाइट"
+  },
+  "student": {
+    "rollNumber": "रोल नंबर",
+    "admissionDate": "प्रवेश तिथि",
+    "dateOfBirth": "जन्म तिथि",
+    "bloodGroup": "रक्त समूह",
+    "emergencyContact": "आपातकालीन संपर्क"
+  },
+  "attendance": {
+    "present": "उपस्थित",
+    "absent": "अनुपस्थित",
+    "late": "देर से",
+    "excused": "माफ",
+    "markAttendance": "उपस्थिति चिह्नित करें",
+    "attendanceReport": "उपस्थिति रिपोर्ट"
+  },
+  "library": {
+    "books": "पुस्तकें",
+    "issueBook": "पुस्तक जारी करें",
+    "returnBook": "पुस्तक वापस करें",
+    "dueDate": "नियत तारीख",
+    "fine": "जुर्माना"
+  }
+}
